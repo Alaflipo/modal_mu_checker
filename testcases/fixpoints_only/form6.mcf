@@ -1,1 +1,0 @@
-(nu X. mu Y. (X || Y) && mu Z. nu P. (Z && mu A. (Z || (A || P))))

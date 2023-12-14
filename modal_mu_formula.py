@@ -1,3 +1,4 @@
+from __future__ import annotations
 import string as string
 
 true_first = 't'
@@ -31,6 +32,9 @@ class RecursionVar:
     def __str__(self): 
         return self.variable_name
     
+    def __repr__(self) -> str:
+        return self.variable_name
+    
 class ActionVar: 
 
     def __init__(self, action_name: str): 
@@ -57,23 +61,86 @@ class LogicFormula:
     def __str__(self): 
         return '({lhs} {opp} {rhs})'.format(lhs=self.lhs, opp=self.opp, rhs=self.rhs)
 
+def isinstance_group(formula, types: list): 
+    for ftype in types: 
+        if isinstance(formula, ftype): 
+            return True 
+    return False 
+
 class MuFormula: 
 
     def __init__(self, recursion_var, formula): 
         self.recursion_var: RecursionVar = recursion_var
         self.formula = formula 
+        mu_sub_formulas = self.find_all_mu_subformulas(formula)
+        self.open_subformulas: list[MuFormula] = [g for g in mu_sub_formulas if self.is_open_subformula(g)]
+        self.surrounding_binder = None 
+
+    def find_all_mu_subformulas(self, formula) -> list[MuFormula]: 
+        if (isinstance_group(formula, [Literal, RecursionVar])): 
+            return []
+        elif (isinstance_group(formula, [BoxFormula, DiamondFormula, NuFormula])): 
+            return self.find_all_mu_subformulas(formula.formula)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.find_all_mu_subformulas(formula.lhs) + self.find_all_mu_subformulas(formula.rhs)
+        elif (isinstance(formula, MuFormula)): 
+            return [formula] + self.find_all_mu_subformulas(formula.formula)
+
+    def is_open_subformula(self, formula, seen_vars: list[RecursionVar] = []) -> bool: 
+        if (isinstance(formula, RecursionVar)): 
+            return formula not in seen_vars
+        if (isinstance(formula, Literal)): 
+            return False
+        elif (isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.is_open_subformula(formula.formula, seen_vars)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.is_open_subformula(formula.lhs, seen_vars) or self.is_open_subformula(formula.rhs, seen_vars)
+        elif (isinstance_group(formula, [MuFormula, NuFormula])): 
+            return self.is_open_subformula(formula.formula, seen_vars + [formula.recursion_var])
 
     def __str__(self): 
         return 'mu {variable}. {formula}'.format(variable=self.recursion_var, formula=self.formula)     
+    
+    def __repr__(self) -> str:
+        return 'mu {variable}. {formula}'.format(variable=self.recursion_var, formula=self.formula) 
 
 class NuFormula: 
 
     def __init__(self, recursion_var, formula):
         self.recursion_var: RecursionVar = recursion_var
         self.formula = formula 
+        nu_sub_formulas = self.find_all_nu_subformulas(formula)
+        self.open_subformulas: list[NuFormula] = [g for g in nu_sub_formulas if self.is_open_subformula(g)]
+        self.surrounding_binder = None 
+
+    def find_all_nu_subformulas(self, formula) -> list[NuFormula]: 
+        if (isinstance_group(formula, [Literal, RecursionVar])): 
+            return []
+        elif (isinstance_group(formula, [BoxFormula, DiamondFormula, MuFormula])): 
+            return self.find_all_nu_subformulas(formula.formula)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.find_all_nu_subformulas(formula.lhs) + self.find_all_nu_subformulas(formula.rhs)
+        elif (isinstance(formula, NuFormula)): 
+            return [formula] + self.find_all_nu_subformulas(formula.formula)
+
+    def is_open_subformula(self, formula, seen_vars: list[RecursionVar] = []) -> bool: 
+        if (isinstance(formula, RecursionVar)): 
+            return formula not in seen_vars
+        if (isinstance(formula, Literal)): 
+            return False
+        elif (isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.is_open_subformula(formula.formula, seen_vars)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.is_open_subformula(formula.lhs, seen_vars) or self.is_open_subformula(formula.rhs, seen_vars)
+        elif (isinstance_group(formula, [MuFormula, NuFormula])): 
+            return self.is_open_subformula(formula.formula, seen_vars + [formula.recursion_var])
+
 
     def __str__(self): 
         return 'nu {variable}. {formula}'.format(variable=self.recursion_var, formula=self.formula)     
+    
+    def __repr__(self) -> str:
+        return 'nu {variable}. {formula}'.format(variable=self.recursion_var, formula=self.formula)   
 
 class DiamondFormula: 
     
@@ -103,6 +170,7 @@ class ModalMuFormula:
         self.ND = self.calc_ND(self.formula)
         self.AD = self.calc_AD(self.formula)
         self.dAD = self.calc_dAD(self.formula)
+        self.set_surrounding_binders(self.formula)
         
     def expect(self, string_to_expect): 
         start = self.counter 
@@ -203,7 +271,7 @@ class ModalMuFormula:
 
     def read_and_parse_formula(self, filepath): 
         with open(filepath) as file: 
-            self.formula_string = file.read().strip()
+            self.formula_string = file.readlines()[-1].strip()
         return self.parse_formula()
 
     def parse_formula(self):
@@ -237,6 +305,19 @@ class ModalMuFormula:
             if isinstance(formula, ftype): 
                 return True 
         return False 
+    
+    def set_surrounding_binders(self, formula, last_seen=None):
+        if (self.isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            self.set_surrounding_binders(formula.formula, last_seen)
+        elif (isinstance(formula, LogicFormula)): 
+            self.set_surrounding_binders(formula.lhs, last_seen)
+            self.set_surrounding_binders(formula.rhs, last_seen)
+        elif (isinstance(formula, MuFormula)): 
+            formula.surrounding_binder = last_seen
+            self.set_surrounding_binders(formula.formula, last_seen=formula)
+        elif (isinstance(formula, NuFormula)): 
+            formula.surrounding_binder = last_seen
+            self.set_surrounding_binders(formula.formula, last_seen=formula)
     
     def search_mnu(self, formula, mu: bool): 
         if (self.isinstance_group(formula, [Literal, RecursionVar])): 
@@ -314,7 +395,16 @@ class ModalMuFormula:
             return max(1, self.calc_dAD(formula.formula), 1 + max(
                 [0] + [self.calc_dAD(g) for g in self.search_mnu_dep(formula.formula, formula.recursion_var, True) 
                        if self.search_rec_var(g, formula.recursion_var.variable_name)]))
-           
+
+    def print_results(self, filename: str): 
+        print('\n----------------------------------------------')
+        print('FORMULA:')
+        print('Filename:', filename)
+        print('Formula to check: ', self)
+        print('Nesting depth:', self.ND)
+        print('Alternation depth:', self.AD)
+        print('Dependend alternation depth:', self.AD)
+
     def __str__(self): 
         return '{formula}'.format(formula=self.formula)
         

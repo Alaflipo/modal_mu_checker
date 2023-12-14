@@ -32,35 +32,38 @@ class State:
 class LTS:
     
     def __init__(self, filepath):
-        self.states: list[State] = []
+        self.states: set[State] = set()
         self.n_states: int = 0 
         self.n_trans: int = 0 
         self.initial_state: State = None 
         self.recursion_vars: list[RecursionVar] = []
         self.recursion_sets: list[set[State]] = []
+        self.fixed_point_iterations: int = 0 
         self.set_LTS_from_file(filepath) 
     
     def check_formula(self, formula: ModalMuFormula) -> set[State]: 
         self.recursion_vars = formula.recursion_vars
         self.recursion_sets = [None] * len(self.recursion_vars)
+        self.fixed_point_iterations = 0 
         return self.eval(formula.formula)
     
     def check_formula_el(self, formula: ModalMuFormula) -> set[State]: 
         self.recursion_vars = formula.recursion_vars
         self.recursion_sets = []
+        self.fixed_point_iterations = 0 
         for var in self.recursion_vars: 
             if (var.bound == "mu"): 
                 self.recursion_sets.append(set())
             else: 
-                self.recursion_sets.append(set(self.states))
+                self.recursion_sets.append(self.states)
         assert len(self.recursion_sets) == len(self.recursion_vars)
-        return self.eval(formula.formula)
+        return self.eval_el(formula.formula)
     
     def eval(self, formula) -> set[State]: 
         if (isinstance(formula, RecursionVar)): 
             return self.recursion_sets[formula.index]
         elif (isinstance(formula, Literal)): 
-            return set(self.states) if formula.literal else set()
+            return self.states if formula.literal else set()
         elif (isinstance(formula, LogicFormula)): 
             if (formula.opp.operator == "&&"): 
                 return self.eval(formula.lhs) & self.eval(formula.rhs)
@@ -93,11 +96,12 @@ class LTS:
                     if transition_holds: found_states.add(state)
             return found_states 
         elif (isinstance(formula, NuFormula)): 
-            self.recursion_sets[formula.recursion_var.index] = set(self.states)
+            self.recursion_sets[formula.recursion_var.index] = self.states
             rv_prime = set() 
             while (self.recursion_sets[formula.recursion_var.index] != rv_prime): 
                 rv_prime = self.recursion_sets[formula.recursion_var.index]
                 self.recursion_sets[formula.recursion_var.index] = self.eval(formula.formula)
+                self.fixed_point_iterations += 1
             return self.recursion_sets[formula.recursion_var.index]
         elif (isinstance(formula, MuFormula)): 
             self.recursion_sets[formula.recursion_var.index] = set()
@@ -105,13 +109,14 @@ class LTS:
             while (self.recursion_sets[formula.recursion_var.index] != rv_prime): 
                 rv_prime = self.recursion_sets[formula.recursion_var.index]
                 self.recursion_sets[formula.recursion_var.index] = self.eval(formula.formula)
+                self.fixed_point_iterations += 1
             return self.recursion_sets[formula.recursion_var.index]
 
     def eval_el(self, formula) -> set[State]: 
         if (isinstance(formula, RecursionVar)): 
             return self.recursion_sets[formula.index]
         elif (isinstance(formula, Literal)): 
-            return set(self.states) if formula.literal else set()
+            return self.states if formula.literal else set()
         elif (isinstance(formula, LogicFormula)): 
             if (formula.opp.operator == "&&"): 
                 return self.eval_el(formula.lhs) & self.eval_el(formula.rhs)
@@ -144,9 +149,26 @@ class LTS:
                     if transition_holds: found_states.add(state)
             return found_states 
         elif (isinstance(formula, NuFormula)): 
-            pass
+            if (isinstance(formula.surrounding_binder, MuFormula)):
+                for open_sub_formulae in formula.open_subformulas: 
+                    self.recursion_sets[open_sub_formulae.recursion_var.index] = set()
+            X_old = None 
+            while (X_old != self.recursion_sets[formula.recursion_var.index]):
+                X_old = self.recursion_sets[formula.recursion_var.index]
+                self.recursion_sets[formula.recursion_var.index] = self.eval_el(formula.formula)
+                self.fixed_point_iterations += 1
+            return self.recursion_sets[formula.recursion_var.index]
+        
         elif (isinstance(formula, MuFormula)): 
-            pass
+            if (isinstance(formula.surrounding_binder, NuFormula)):
+                for open_sub_formulae in formula.open_subformulas: 
+                    self.recursion_sets[open_sub_formulae.recursion_var.index] = set()
+            X_old = None 
+            while (X_old != self.recursion_sets[formula.recursion_var.index]):
+                X_old = self.recursion_sets[formula.recursion_var.index]
+                self.recursion_sets[formula.recursion_var.index] = self.eval_el(formula.formula)
+                self.fixed_point_iterations += 1
+            return self.recursion_sets[formula.recursion_var.index]
 
     def set_LTS_from_file(self, filepath): 
         with open(filepath) as file: 
@@ -154,14 +176,25 @@ class LTS:
             info = lines[0].split(' ')[1][1:-1].split(',')
             self.n_trans = int(info[1])
             self.n_states = int(info[2])
-            self.states = [State(int(number)) for number in range(self.n_states)]
-            self.initial_state = self.states[int(info[0])]
+            states_list = [State(int(number)) for number in range(self.n_states)]
+            self.initial_state = states_list[int(info[0])]
             for line in lines[1:]: 
                 transition = line[1:-1].split(',')
                 start = int(transition[0])
                 end = int(transition[2])
                 label = transition[1][1:-1]
-                self.states[start].add_transition(self.states[end], label)
+                states_list[start].add_transition(states_list[end], label)
+            self.states = set(states_list)
+            
+
+    def get_verdict(self, results): 
+        return self.initial_state in results
+
+    def print_results(self, results, el: bool): 
+        print('\nLTS CHECK {}'.format("Emerson-Lei" if el else "Naive"))
+        # print('States where it holds:', results)
+        print('Verdict:', self.get_verdict(results))
+        print('Fix point iterations:', self.fixed_point_iterations)
     
     def __str__(self): 
         output_string = 'Number of states: {states} \nNumber of transitions: {trans} \nInitial state: {init}\n'.format(

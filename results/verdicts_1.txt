@@ -1,0 +1,19 @@
+Naive verdict:
+invariantly_inevitably_eat.mcf
+[False, False, False, False, False, False, False, False, False, False]
+invariantly_plato_starves.mcf
+[False, False, False, False, False, False, False, False, False, False]
+invariantly_possibly_eat.mcf
+[False, False, False, False, False, False, False, False, False, False]
+plato_infinitely_often_can_eat.mcf
+[True, True, True, True, True, True, True, True, True, True]
+
+Emerson lei verdict:
+invariantly_inevitably_eat.mcf
+[False, False, False, False, False, False, False, False, False, False]
+invariantly_plato_starves.mcf
+[False, False, False, False, False, False, False, False, False, False]
+invariantly_possibly_eat.mcf
+[False, False, False, False, False, False, False, False, False, False]
+plato_infinitely_often_can_eat.mcf
+[True, True, True, True, True, True, True, True, True, True]
