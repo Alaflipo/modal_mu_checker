@@ -23,8 +23,10 @@ class Literal:
 
 class RecursionVar: 
 
-    def __init__(self, variable_name: str): 
+    def __init__(self, variable_name: str, index: int, utype: str): 
         self.variable_name: str = variable_name
+        self.index: int = index 
+        self.bound: str = utype
     
     def __str__(self): 
         return self.variable_name
@@ -47,9 +49,9 @@ class Operator:
 
 class LogicFormula: 
 
-    def __init__(self, lhs, opp, rhs):
+    def __init__(self, lhs, opp: Operator, rhs):
         self.lhs = lhs 
-        self.opp = opp 
+        self.opp: Operator = opp 
         self.rhs = rhs  
     
     def __str__(self): 
@@ -58,7 +60,7 @@ class LogicFormula:
 class MuFormula: 
 
     def __init__(self, recursion_var, formula): 
-        self.recursion_var = recursion_var
+        self.recursion_var: RecursionVar = recursion_var
         self.formula = formula 
 
     def __str__(self): 
@@ -67,7 +69,7 @@ class MuFormula:
 class NuFormula: 
 
     def __init__(self, recursion_var, formula):
-        self.recursion_var = recursion_var
+        self.recursion_var: RecursionVar = recursion_var
         self.formula = formula 
 
     def __str__(self): 
@@ -76,7 +78,7 @@ class NuFormula:
 class DiamondFormula: 
     
     def __init__(self, action, formula):
-        self.action = action
+        self.action: ActionVar = action
         self.formula = formula 
 
     def __str__(self): 
@@ -85,21 +87,23 @@ class DiamondFormula:
 class BoxFormula: 
     
     def __init__(self, action, formula):
-        self.action = action
+        self.action: ActionVar = action
         self.formula = formula 
 
     def __str__(self): 
         return '[{action}]{formula}'.format(action=self.action, formula=self.formula)     
-
-
 
 class ModalMuFormula: 
 
     def __init__(self, filepath): 
         self.formula_string = ''
         self.counter = 0 
+        self.recursion_vars: list[RecursionVar] = []
         self.formula = self.read_and_parse_formula(filepath)
-    
+        self.ND = self.calc_ND(self.formula)
+        self.AD = self.calc_AD(self.formula)
+        self.dAD = self.calc_dAD(self.formula)
+        
     def expect(self, string_to_expect): 
         start = self.counter 
         end = start + len(string_to_expect)
@@ -122,8 +126,15 @@ class ModalMuFormula:
         self.skip_white_space()
         return Literal(boolean)
 
-    def parse_recursion_var(self) -> RecursionVar: 
-        recursion_var = RecursionVar(self.formula_string[self.counter])
+    def parse_recursion_var(self, new, utype=None) -> RecursionVar: 
+        recursion_var = None 
+        if new: 
+            recursion_var = RecursionVar(self.formula_string[self.counter], len(self.recursion_vars), utype)
+            self.recursion_vars.append(recursion_var)
+        else: 
+            for i, rv in enumerate(self.recursion_vars): 
+                if (rv.variable_name == self.formula_string[self.counter]): 
+                    recursion_var = self.recursion_vars[i]
         self.counter += 1 
         self.skip_white_space()
         return recursion_var
@@ -167,7 +178,7 @@ class ModalMuFormula:
         self.required_white_space() 
         recursion_var, formula = None, None  
         if self.formula_string[self.counter] in recursion_var_first: 
-            recursion_var = self.parse_recursion_var()
+            recursion_var = self.parse_recursion_var(new=True, utype=u_type)
         else: raise Exception("No recursion variable found in {} formula".format(u_type))
         self.expect(".")
         self.skip_white_space()
@@ -204,7 +215,7 @@ class ModalMuFormula:
             return self.parse_literal(False, 'false')
         # Check if we have found a recursion variable  
         elif (self.formula_string[self.counter] in recursion_var_first):
-            return self.parse_recursion_var()
+            return self.parse_recursion_var(new=False)
         # Check if we have found the start of a logic formula 
         elif (self.formula_string[self.counter] == logic_first): 
             return self.parse_logic_formula()
@@ -220,7 +231,90 @@ class ModalMuFormula:
         # Check if we have found the start of a box modality formula
         elif (self.formula_string[self.counter] == box_first): 
             return self.parse_box_diamond_formula(['[', ']'])
-            
+    
+    def isinstance_group(self, formula, types: list): 
+        for ftype in types: 
+            if isinstance(formula, ftype): 
+                return True 
+        return False 
+    
+    def search_mnu(self, formula, mu: bool): 
+        if (self.isinstance_group(formula, [Literal, RecursionVar])): 
+            return []
+        elif (self.isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.search_mnu(formula.formula, mu)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.search_mnu(formula.lhs, mu) + self.search_mnu(formula.rhs, mu)
+        elif (isinstance(formula, MuFormula)): 
+            return [formula] + self.search_mnu(formula.formula, mu) if mu else self.search_mnu(formula.formula, mu)
+        elif (isinstance(formula, NuFormula)): 
+            return [formula] + self.search_mnu(formula.formula, mu) if not mu else self.search_mnu(formula.formula, mu)
+
+    def search_rec_var(self, formula, rec_var_name): 
+        if (isinstance(formula, RecursionVar)):
+            return rec_var_name == formula.variable_name 
+        elif (self.isinstance_group(formula, [BoxFormula, DiamondFormula, MuFormula, NuFormula])): 
+            return self.search_rec_var(formula.formula, rec_var_name)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.search_rec_var(formula.lhs, rec_var_name) or self.search_rec_var(formula.rhs, rec_var_name)
+        else: 
+            return False 
+    
+    def search_mnu_dep(self, formula, rec_var: RecursionVar, mu: bool): 
+        if (self.isinstance_group(formula, [Literal, RecursionVar])): 
+            return []
+        elif (self.isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.search_mnu_dep(formula.formula, rec_var, mu)
+        elif (isinstance(formula, LogicFormula)): 
+            return self.search_mnu_dep(formula.lhs, rec_var, mu) + self.search_mnu_dep(formula.rhs, rec_var, mu)
+        elif (isinstance(formula, MuFormula)): 
+            return [formula] + self.search_mnu_dep(formula.formula, rec_var, mu) if mu else self.search_mnu_dep(formula.formula, rec_var, mu)
+        elif (isinstance(formula, NuFormula)): 
+            return [formula] + self.search_mnu_dep(formula.formula, rec_var, mu) if not mu else self.search_mnu_dep(formula.formula, rec_var, mu)
+
+    # calculates the nesting depth 
+    def calc_ND(self, formula) -> int: 
+        if (self.isinstance_group(formula, [Literal, RecursionVar])): 
+            return 0 
+        elif (self.isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.calc_ND(formula.formula)
+        elif (isinstance(formula, LogicFormula)): 
+            return max(self.calc_ND(formula.lhs), self.calc_ND(formula.rhs))
+        elif (self.isinstance_group(formula, [MuFormula, NuFormula])): 
+            return 1 + self.calc_ND(formula.formula)
+    
+    # calculates the alternation depth 
+    def calc_AD(self, formula) -> int: 
+        if (self.isinstance_group(formula, [Literal, RecursionVar])): 
+            return 0 
+        elif (self.isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.calc_AD(formula.formula)
+        elif (isinstance(formula, LogicFormula)): 
+            return max(self.calc_AD(formula.lhs), self.calc_AD(formula.rhs))
+        elif (isinstance(formula, MuFormula)): 
+            return max(1, self.calc_AD(formula.formula), 1 + max(
+                [0] + [self.calc_AD(g) for g in self.search_mnu(formula.formula, False)]))
+        elif (isinstance(formula, NuFormula)): 
+            return max(1, self.calc_AD(formula.formula), 1 + max(
+                [0] + [self.calc_AD(g) for g in self.search_mnu(formula.formula, True)]))
+
+    # calculates the dependent alternation depth 
+    def calc_dAD(self, formula) -> int: 
+        if (self.isinstance_group(formula, [Literal, RecursionVar])): 
+            return 0 
+        elif (self.isinstance_group(formula, [BoxFormula, DiamondFormula])): 
+            return self.calc_dAD(formula.formula)
+        elif (isinstance(formula, LogicFormula)): 
+            return max(self.calc_dAD(formula.lhs), self.calc_dAD(formula.rhs))
+        elif (isinstance(formula, MuFormula)): 
+            return max(1, self.calc_dAD(formula.formula), 1 + max(
+                [0] + [self.calc_dAD(g) for g in self.search_mnu_dep(formula.formula, formula.recursion_var, False) 
+                       if self.search_rec_var(g, formula.recursion_var.variable_name)]))
+        elif (isinstance(formula, NuFormula)): 
+            return max(1, self.calc_dAD(formula.formula), 1 + max(
+                [0] + [self.calc_dAD(g) for g in self.search_mnu_dep(formula.formula, formula.recursion_var, True) 
+                       if self.search_rec_var(g, formula.recursion_var.variable_name)]))
+           
     def __str__(self): 
         return '{formula}'.format(formula=self.formula)
         
