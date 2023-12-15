@@ -1,0 +1,54 @@
+----------------------------------------------
+FORMULA:
+Filename: c.mcf
+Formula to check:  nu X. mu Y. (([choose1]<choose2>Y || <won>X) && ((<choose1>true || <choose2>true) || <won>true))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 1734
+Verdict: False
+Fix point iterations: 25
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 1751
+Verdict: False
+Fix point iterations: 21
+
+----------------------------------------------
+FORMULA:
+Filename: b.mcf
+Formula to check:  mu X. (([choose1][choose2]X || <won>true) && ((<choose1>true || <choose2>true) || <won>true))
+Nesting depth: 1
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 1735
+Verdict: False
+Fix point iterations: 2
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 1735
+Verdict: False
+Fix point iterations: 2
+
+----------------------------------------------
+FORMULA:
+Filename: a.mcf
+Formula to check:  mu X. (([choose1]<choose2>X || <won>true) && ((<choose1>true || <choose2>true) || <won>true))
+Nesting depth: 1
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 1751
+Verdict: False
+Fix point iterations: 18
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 1751
+Verdict: False
+Fix point iterations: 18
+------------------------------------

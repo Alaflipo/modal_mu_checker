@@ -13,7 +13,7 @@ formula_first = true_first + false_first + recursion_var_first + logic_first + m
 and_opp_first = '&'
 or_opp_first = '|'
 opp_first = and_opp_first + or_opp_first 
-action_name_first = string.ascii_lowercase
+action_name_first = string.ascii_lowercase + '_' + string.digits
 
 class Literal: 
     def __init__(self, boolean: bool): 
@@ -271,7 +271,10 @@ class ModalMuFormula:
 
     def read_and_parse_formula(self, filepath): 
         with open(filepath) as file: 
-            self.formula_string = file.readlines()[-1].strip()
+            self.formula_string = ''
+            for line in file.readlines(): 
+                if (line[0] != '%'): 
+                    self.formula_string += line.strip()
         return self.parse_formula()
 
     def parse_formula(self):
@@ -319,6 +322,7 @@ class ModalMuFormula:
             formula.surrounding_binder = last_seen
             self.set_surrounding_binders(formula.formula, last_seen=formula)
     
+    # Returns all mu or nu subformula's of a given formula 
     def search_mnu(self, formula, mu: bool): 
         if (self.isinstance_group(formula, [Literal, RecursionVar])): 
             return []
@@ -331,6 +335,7 @@ class ModalMuFormula:
         elif (isinstance(formula, NuFormula)): 
             return [formula] + self.search_mnu(formula.formula, mu) if not mu else self.search_mnu(formula.formula, mu)
 
+    # Returns true if the formula has contains a recursion variable with the given name 
     def search_rec_var(self, formula, rec_var_name): 
         if (isinstance(formula, RecursionVar)):
             return rec_var_name == formula.variable_name 
@@ -341,6 +346,7 @@ class ModalMuFormula:
         else: 
             return False 
     
+    # Returns all mu or nu subformula's that depent on a given variable of a given formula 
     def search_mnu_dep(self, formula, rec_var: RecursionVar, mu: bool): 
         if (self.isinstance_group(formula, [Literal, RecursionVar])): 
             return []

@@ -1,0 +1,110 @@
+LTS file: demanding_children_2.aut
+
+----------------------------------------------
+FORMULA:
+Filename: after_ask_wisdom.mcf
+Formula to check:  nu X. (([i]X && ([ask]X && ([playing]X && [wisdom]X))) && [ask]nu Y. ([i]Y && (<wisdom>true || <i>true)))
+Nesting depth: 2
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 10
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 6
+
+----------------------------------------------
+FORMULA:
+Filename: after_ask_eventually_wisdom.mcf
+Formula to check:  nu X. (([i]X && ([ask]X && ([playing]X && [wisdom]X))) && [ask]mu Y. (([i]Y && ([ask]Y && [playing]Y)) && <wisdom>true))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 20
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 20
+
+----------------------------------------------
+FORMULA:
+Filename: after_wisdom_play.mcf
+Formula to check:  nu X. (([i]X && ([ask]X && ([playing]X && [wisdom]X))) && [wisdom]nu Y. ([i]Y && (<playing>true || <i>true)))
+Nesting depth: 2
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 3
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 3
+
+----------------------------------------------
+FORMULA:
+Filename: after_wisdom_eventually_play.mcf
+Formula to check:  nu X. (([i]X && ([ask]X && ([playing]X && [wisdom]X))) && [wisdom]mu Y. (([i]Y && ([ask]Y && [wisdom]Y)) && <playing>true))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 7
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 5
+
+----------------------------------------------
+FORMULA:
+Filename: possible_to_ask_question.mcf
+Formula to check:  nu X. ([i]X && <ask>true)
+Nesting depth: 1
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 3
+Verdict: True
+Fix point iterations: 2
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 3
+Verdict: True
+Fix point iterations: 2
+
+----------------------------------------------
+FORMULA:
+Filename: after_play_ask.mcf
+Formula to check:  nu X. (([i]X && ([ask]X && ([playing]X && [wisdom]X))) && [playing]nu Y. ([i]Y && (<ask>true || <i>true)))
+Nesting depth: 2
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 7
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 8
+Verdict: True
+Fix point iterations: 5
+------------------------------------

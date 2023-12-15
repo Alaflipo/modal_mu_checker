@@ -1,0 +1,230 @@
+
+LTS file: german_linear_2.1.aut
+
+----------------------------------------------
+FORMULA:
+Filename: infinitely_often_exclusive.mcf
+Formula to check:  nu X. mu Y. (<exclusive>X || (<i>Y || (<req_exclusive>Y || (<req_shared>Y || <shared>Y))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 964
+Verdict: True
+Fix point iterations: 25
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 964
+Verdict: True
+Fix point iterations: 25
+
+----------------------------------------------
+FORMULA:
+Filename: infinite_run_no_access.mcf
+Formula to check:  nu X. (<i>X || (<req_exclusive>X || <req_shared>X))
+Nesting depth: 1
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 346
+Verdict: True
+Fix point iterations: 27
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 346
+Verdict: True
+Fix point iterations: 27
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_possibly_exclusive_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([req_shared]X && ([exclusive]X && ([shared]X && [req_exclusive]mu Y. (<i>Y || (<req_exclusive>Y || (<req_shared>Y || (<shared>Y || <exclusive>true)))))))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 964
+Verdict: True
+Fix point iterations: 8665
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 964
+Verdict: True
+Fix point iterations: 385
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_inevitably_exclusive_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([req_shared]X && ([exclusive]X && ([shared]X && [req_exclusive]mu Y. ([i]Y && ([req_exclusive]Y && ([req_shared]Y && [shared]Y))))))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 119152
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 7978
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_eventually_fair_shared_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([exclusive]X && ([shared]X && [req_shared]nu Y. ([i]Y && ([req_exclusive]Y && ([exclusive]Y && ([req_shared]Y && mu Z. (<i>Z || (<req_exclusive>Z || (<req_shared>Z || (<exclusive>Z || <shared>true))))))))))))
+Nesting depth: 3
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 964
+Verdict: True
+Fix point iterations: 4729
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 964
+Verdict: True
+Fix point iterations: 417
+
+LTS file: german_linear_3.1.aut
+
+----------------------------------------------
+FORMULA:
+Filename: infinitely_often_exclusive.mcf
+Formula to check:  nu X. mu Y. (<exclusive>X || (<i>Y || (<req_exclusive>Y || (<req_shared>Y || <shared>Y))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 6742
+Verdict: True
+Fix point iterations: 29
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 6742
+Verdict: True
+Fix point iterations: 29
+
+----------------------------------------------
+FORMULA:
+Filename: infinite_run_no_access.mcf
+Formula to check:  nu X. (<i>X || (<req_exclusive>X || <req_shared>X))
+Nesting depth: 1
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 2725
+Verdict: True
+Fix point iterations: 42
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 2725
+Verdict: True
+Fix point iterations: 42
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_possibly_exclusive_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([req_shared]X && ([exclusive]X && ([shared]X && [req_exclusive]mu Y. (<i>Y || (<req_exclusive>Y || (<req_shared>Y || (<shared>Y || <exclusive>true)))))))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 6742
+Verdict: True
+Fix point iterations: 76105
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 6742
+Verdict: True
+Fix point iterations: 2746
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_inevitably_exclusive_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([req_shared]X && ([exclusive]X && ([shared]X && [req_exclusive]mu Y. ([i]Y && ([req_exclusive]Y && ([req_shared]Y && [shared]Y))))))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 1413386
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 70713
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_eventually_fair_shared_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([exclusive]X && ([shared]X && [req_shared]nu Y. ([i]Y && ([req_exclusive]Y && ([exclusive]Y && ([req_shared]Y && mu Z. (<i>Z || (<req_exclusive>Z || (<req_shared>Z || (<exclusive>Z || <shared>true))))))))))))
+Nesting depth: 3
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 6742
+Verdict: True
+Fix point iterations: 37549
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 6742
+Verdict: True
+Fix point iterations: 2709
+
+LTS file: german_linear_4.1.aut
+
+----------------------------------------------
+FORMULA:
+Filename: infinitely_often_exclusive.mcf
+Formula to check:  nu X. mu Y. (<exclusive>X || (<i>Y || (<req_exclusive>Y || (<req_shared>Y || <shared>Y))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 32720
+Verdict: True
+Fix point iterations: 33
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 32720
+Verdict: True
+Fix point iterations: 33
+
+----------------------------------------------
+FORMULA:
+Filename: infinite_run_no_access.mcf
+Formula to check:  nu X. (<i>X || (<req_exclusive>X || <req_shared>X))
+Nesting depth: 1
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 13687
+Verdict: True
+Fix point iterations: 58
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 13687
+Verdict: True
+Fix point iterations: 58
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_possibly_exclusive_access.mcf
+Formula to check:  nu X. ([i]X && ([req_exclusive]X && ([req_shared]X && ([exclusive]X && ([shared]X && [req_exclusive]mu Y. (<i>Y || (<req_exclusive>Y || (<req_shared>Y || (<shared>Y || <exclusive>true)))))))))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2

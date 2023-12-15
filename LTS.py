@@ -192,7 +192,7 @@ class LTS:
 
     def print_results(self, results, el: bool): 
         print('\nLTS CHECK {}'.format("Emerson-Lei" if el else "Naive"))
-        # print('States where it holds:', results)
+        print('Amount of states the formula holds:', len(results))
         print('Verdict:', self.get_verdict(results))
         print('Fix point iterations:', self.fixed_point_iterations)
     

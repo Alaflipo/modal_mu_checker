@@ -1,0 +1,41 @@
+Naive verdict:
+after_ask_wisdom.mcf
+[True, True, True, True, True, True, True, True, True]
+after_ask_eventually_wisdom.mcf
+[False, False, False, False, False, False, False, False, False]
+after_wisdom_play.mcf
+[True, True, True, True, True, True, True, True, True]
+after_wisdom_eventually_play.mcf
+[True, True, True, True, True, True, True, True, True]
+possible_to_ask_question.mcf
+[True, True, True, True, True, True, True, True, True]
+after_play_ask.mcf
+[True, True, True, True, True, True, True, True, True]
+
+Emerson lei verdict:
+after_ask_wisdom.mcf
+[True, True, True, True, True, True, True, True, True]
+after_ask_eventually_wisdom.mcf
+[False, False, False, False, False, False, False, False, False]
+after_wisdom_play.mcf
+[True, True, True, True, True, True, True, True, True]
+after_wisdom_eventually_play.mcf
+[True, True, True, True, True, True, True, True, True]
+possible_to_ask_question.mcf
+[True, True, True, True, True, True, True, True, True]
+after_play_ask.mcf
+[True, True, True, True, True, True, True, True, True]
+
+Amount of states the formula hold:
+after_ask_wisdom.mcf
+8 & 20 & 48 & 112 & 256 & 576 & 1280 & 2816 & 6144
+after_ask_eventually_wisdom.mcf
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+after_wisdom_play.mcf
+8 & 20 & 48 & 112 & 256 & 576 & 1280 & 2816 & 6144
+after_wisdom_eventually_play.mcf
+8 & 20 & 48 & 112 & 256 & 576 & 1280 & 2816 & 6144
+possible_to_ask_question.mcf
+3 & 8 & 20 & 48 & 112 & 256 & 576 & 1280 & 2816
+after_play_ask.mcf
+8 & 20 & 48 & 112 & 256 & 576 & 1280 & 2816 & 6144

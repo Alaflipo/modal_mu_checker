@@ -1,0 +1,74 @@
+
+LTS file: dining_2.aut
+
+----------------------------------------------
+FORMULA:
+Filename: plato_infinitely_often_can_eat.mcf
+Formula to check:  nu X. mu Y. ((<plato>X || <i>Y) || <others>Y)
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 9
+Verdict: True
+Fix point iterations: 18
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 9
+Verdict: True
+Fix point iterations: 11
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_inevitably_eat.mcf
+Formula to check:  nu X. (([i]X && ([plato]X && [others]X)) && mu Y. ([i]Y && (<plato>true || <others>true)))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 9
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 7
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_possibly_eat.mcf
+Formula to check:  nu X. (([i]X && ([plato]X && [others]X)) && mu Y. ((<i>Y || <others>Y) || <plato>true))
+Nesting depth: 2
+Alternation depth: 2
+Dependend alternation depth: 2
+
+LTS CHECK Naive
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 63
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 21
+
+----------------------------------------------
+FORMULA:
+Filename: invariantly_plato_starves.mcf
+Formula to check:  nu X. (([i]X && [others]X) && nu Y. (<i>Y || <others>Y))
+Nesting depth: 2
+Alternation depth: 1
+Dependend alternation depth: 1
+
+LTS CHECK Naive
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 24
+
+LTS CHECK Emerson-Lei
+Amount of states the formula holds: 0
+Verdict: False
+Fix point iterations: 14
