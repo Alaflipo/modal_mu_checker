@@ -1,9 +1,6 @@
 from LTS import LTS
 from modal_mu_formula import ModalMuFormula
 import argparse
-import os 
-# importing package 
-import matplotlib.pyplot as plt 
 
 
 argParser = argparse.ArgumentParser()
